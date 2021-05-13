@@ -21,7 +21,6 @@ export default {
   mounted() {
     const labels = this.chartData.map(d => d.label).reverse();
     const totals = this.chartData.map(d => d.total).reverse();
-
     const {
       borderColor,
       pointBorderColor,

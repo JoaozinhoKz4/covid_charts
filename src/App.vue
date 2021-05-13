@@ -4,7 +4,9 @@
       <div class="col">
         <h1 class="text-center">COVID-19 DATA</h1>
         <input type="text" v-model="country" class="col-md-2 mt-3" />
-        <button @click="consultarDadosCovid(country)" class="ml-2"> Carregue os dados</button>
+        <button @click="consultarDadosCovid(country)" class="ml-2">
+          Carregue os dados
+        </button>
         <button @click="limparDados" class="ml-2">Limpar consulta</button>
       </div>
     </div>
@@ -59,7 +61,7 @@ export default {
   data() {
     return {
       country: null,
-      countryNames : [],
+      countryNames: [],
       arrPositive: [],
       positiveChartColors: {
         borderColor: "#077187",
@@ -91,8 +93,10 @@ export default {
                 beginAtZero: true,
                 callback: function (value) {
                   if (value % 1 === 0 || value >= 1000) {
-                    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                  } 
+                    return value
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                  }
                 },
               },
             },
@@ -107,65 +111,70 @@ export default {
       this.arrDeaths = [];
       this.arrRecovered = [];
     },
-    async consultarDadosCovid(country) {
-      await this.getNames();
+    consultarDadosCovid(country) {
+      this.countryNames = [];
       let date = new Date();
       date = moment(date).format("DD/MM/YYYY");
-      console.log(date)
+      console.log(date);
       const label = "global";
-      if (country !== null) {
-        if(!this.countryNames.includes(country)) {
-          alert("País não encontrado")
-          return false
-        }
-        axios({
-          url: `https://coronavirus-19-api.herokuapp.com/countries/${country}`,
-          method: "GET",
-        })
-          .then((response) => {
-            this.arrPositive.push({ label: response.data.country, total: response.data.cases });
-            this.arrDeaths.push({ label: response.data.country, total: response.data.deaths });
-            this.arrRecovered.push({ label: response.data.country, total: response.data.recovered });
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-          .then(() => {
-            this.country = "";
-          });
-      } else {
-        axios({
-          url: `https://coronavirus-19-api.herokuapp.com/all`,
-          method: "GET",
-        })
-          .then((response) => {
-            this.arrPositive.push({ label , total: response.data.cases });
-            this.arrDeaths.push({ label , total: response.data.deaths });
-            this.arrRecovered.push({  label , total: response.data.recovered });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-    },
-    getNames() {
       axios({
-        url: 'https://coronavirus-19-api.herokuapp.com/countries/',
-        method: "GET"
+        url: "https://coronavirus-19-api.herokuapp.com/countries/",
+        method: "GET",
       })
-       .then((response)=> {
-         response.data.forEach(country => {
-           this.countryNames.push(country.country)
-         });
-         console.log(this.countryNames)
-       })
-       .catch((error)=> {
-         console.log(error);
-       })
-    }
+        .then((response) => {
+          response.data.forEach((element) => {
+            this.countryNames.push(element.country);
+          });
+          if (country !== null) {
+            if (!this.countryNames.includes(country)) {
+              alert("País não encontrado");
+              return false;
+            }
+            axios({
+              url: `https://coronavirus-19-api.herokuapp.com/countries/${country}`,
+              method: "GET",
+            })
+              .then((resp) => {
+                this.arrPositive.push({
+                  label: resp.data.country,
+                  total: resp.data.cases,
+                });
+                this.arrDeaths.push({
+                  label: resp.data.country,
+                  total: resp.data.deaths,
+                });
+                this.arrRecovered.push({
+                  label: resp.data.country,
+                  total: resp.data.recovered,
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+              })
+              .then(() => {
+                this.country = "";
+              });
+          } else {
+            axios({
+              url: `https://coronavirus-19-api.herokuapp.com/all`,
+              method: "GET",
+            })
+              .then((resp) => {
+                this.arrPositive.push({ label, total: resp.data.cases });
+                this.arrDeaths.push({ label, total: resp.data.deaths });
+                this.arrRecovered.push({ label, total: resp.data.recovered });
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
   },
-  watch: {
-	},
+  watch: {},
 };
 </script>
 

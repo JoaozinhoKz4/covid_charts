@@ -4,7 +4,8 @@
       <div class="col">
         <h1 class="text-center">COVID-19 DATA</h1>
         <input type="text" v-model="country" class="col-md-2 mt-3" />
-        <button @click="consultarDadosCovid(country)"  class="ml-2"> Carregue os dados</button>   
+        <button @click="consultarDadosCovid(country)" class="ml-2"> Carregue os dados</button>
+        <button @click="limparDados" class="ml-2">Limpar consulta</button>
       </div>
     </div>
     <div class="row mt-5" v-if="arrPositive.length > 0">
@@ -30,7 +31,7 @@
       </div>
     </div>
 
-    <div class="row mt-5 mb-5">
+    <div class="row mt-5 mb-5" v-if="arrDeaths.length > 0">
       <div class="col">
         <h2 class="text-center">Deaths</h2>
         <line-chart
@@ -101,6 +102,11 @@ export default {
     };
   },
   methods: {
+    limparDados() {
+      this.arrPositive = [];
+      this.arrDeaths = [];
+      this.arrRecovered = [];
+    },
     async consultarDadosCovid(country) {
       await this.getNames();
       let date = new Date();

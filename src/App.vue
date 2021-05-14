@@ -7,10 +7,13 @@
         <button @click="consultarDadosCovid(country)" class="ml-2">
           Carregue os dados
         </button>
+        <button @click="consultarDadosComplexos(country)" disabled class="ml-2">
+          Complexos
+        </button>
         <button @click="limparDados" class="ml-2">Limpar consulta</button>
       </div>
     </div>
-    <div class="row mt-5" v-if="arrPositive.length > 0">
+    <div class="row"><div class="row mt-5" v-if="arrPositive.length > 0">
       <div class="col">
         <h2 class="text-center">Positive</h2>
         <line-chart
@@ -44,6 +47,17 @@
           label="Deaths"
         />
       </div>
+    </div></div>
+    <div class="row mt-5 mb-5" v-if="arrTodayDeaths.length > 0">
+      <div class="col">
+        <h2 class="text-center">Mortes no dia de Hoje</h2>
+        <multiple-chart
+          :chartData="arrTodayDeaths"
+          :options="chartOptions"
+          :label="date"
+          :chartColors="arrTodayDeaths"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -53,13 +67,18 @@ import axios from "axios";
 import moment from "moment";
 
 import LineChart from "./components/LineChart";
+import MultipleChart from './components/MultipleChart.vue';
+
 
 export default {
   components: {
     LineChart,
+    MultipleChart,
   },
   data() {
     return {
+      datasets: [],
+      date: null,
       country: null,
       countryNames: [],
       arrPositive: [],
@@ -68,6 +87,13 @@ export default {
         pointBorderColor: "#0E1428",
         pointBackgroundColor: "#AFD6AC",
         backgroundColor: "#74A57F",
+      },
+      arrTodayDeaths: [],
+      todayColors: {
+        borderColor: "#00042A",
+        pointBorderColor: "#0E1428",
+        pointBackgroundColor: "#AFD6AC",
+        backgroundColor: "#00042A",
       },
       arrRecovered: [],
       recoveredColors: {
@@ -115,7 +141,7 @@ export default {
       this.countryNames = [];
       let date = new Date();
       date = moment(date).format("DD/MM/YYYY");
-      console.log(date);
+      this.date = date;
       const label = "global";
       axios({
         url: "https://coronavirus-19-api.herokuapp.com/countries/",
@@ -147,6 +173,11 @@ export default {
                   label: resp.data.country,
                   total: resp.data.recovered,
                 });
+                this.arrTodayDeaths.push({
+                  label: resp.data.country,
+                  total: resp.data.todayDeaths,
+                  backgroundColor: this.getRandomColor()
+                })
               })
               .catch((error) => {
                 console.log(error);
@@ -154,7 +185,7 @@ export default {
               .then(() => {
                 this.country = "";
               });
-          } else {
+          } else if (country === "" || country === null) {
             axios({
               url: `https://coronavirus-19-api.herokuapp.com/all`,
               method: "GET",
@@ -173,6 +204,63 @@ export default {
           console.log(error);
         });
     },
+    getRandomColor() {
+      var letters = '0123456789ABCDEF';
+      var color = '#';
+      for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    },
+    consultarDadosComplexos(country) {
+      
+      axios({
+              url: `https://coronavirus-19-api.herokuapp.com/countries/${country}`,
+              method: "GET",
+            })
+              .then((resp) => {
+                this.datasets.push({
+                  label: resp.data.country,
+                  data: resp.data.cases,
+                  ...this.positiveChartColors
+                });
+                this.datasets.push({
+                  label: resp.data.country,
+                  data: resp.data.deaths,
+                  ...this.deathColors
+                });
+                this.datasets.push({
+                  label: resp.data.country,
+                  data: resp.data.recovered,
+                  ...this.recoveredColors
+                });
+                console.log(this.datasets);
+              })
+              .catch((error) => {
+                console.log(error);
+              })
+              .then(() => {
+                this.country = "";
+              });
+    },
+    translateCountryName(country) {
+      axios({
+          url : "https://translation.googleapis.com/language/translate/v2",
+          method: "POST",
+          headers: "Bearer gcloud auth application-default print-access-token",
+          data: {
+            q: country,
+            source: "en",
+            target: "pt",
+            format: "text"
+          }})
+          .then((response)=>{
+            return response
+          })
+          .catch((error)=> {
+            console.log(error);
+          })
+    }
   },
   watch: {},
 };

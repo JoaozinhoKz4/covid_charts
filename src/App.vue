@@ -15,7 +15,7 @@
     </div>
     <div class="row"><div class="row mt-5" v-if="arrPositive.length > 0">
       <div class="col">
-        <h2 class="text-center">Positive</h2>
+        <h2 class="text-center">Positivos</h2>
         <line-chart
           :chartData="arrPositive"
           :options="chartOptions"
@@ -26,7 +26,7 @@
     </div>
     <div class="row mt-5" v-if="arrRecovered.length > 0">
       <div class="col">
-        <h2 class="text-center">Recovered</h2>
+        <h2 class="text-center">Recuperados</h2>
         <line-chart
           :chartData="arrRecovered"
           :options="chartOptions"
@@ -38,7 +38,7 @@
 
     <div class="row mt-5 mb-5" v-if="arrDeaths.length > 0">
       <div class="col">
-        <h2 class="text-center">Deaths</h2>
+        <h2 class="text-center">Mortes totais</h2>
         <line-chart
           v-if="arrDeaths.length > 0"
           :chartData="arrDeaths"
@@ -49,6 +49,28 @@
       </div>
     </div></div>
     <div class="row mt-5 mb-5" v-if="arrTodayDeaths.length > 0">
+      <div class="col">
+        <h2 class="text-center">Mortes no dia de Hoje {{this.date}}</h2>
+        <multiple-chart
+          :chartData="arrTodayDeaths"
+          :options="chartOptions"
+          :label="date"
+          :chartColors="arrTodayDeaths"
+        />
+      </div>
+    </div>
+       <div class="row mt-5 mb-5" v-if="arrTodayDeaths.length > 0">
+      <div class="col">
+        <h2 class="text-center">Mortes no dia de Hoje</h2>
+        <multiple-chart
+          :chartData="arrTodayDeaths"
+          :options="chartOptions"
+          :label="date"
+          :chartColors="arrTodayDeaths"
+        />
+      </div>
+    </div>
+       <div class="row mt-5 mb-5" v-if="arrTodayDeaths.length > 0">
       <div class="col">
         <h2 class="text-center">Mortes no dia de Hoje</h2>
         <multiple-chart
@@ -109,6 +131,7 @@ export default {
         pointBackgroundColor: "#402A2C",
         backgroundColor: "#402A2C",
       },
+      arrComplex: [],
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false,
@@ -173,6 +196,11 @@ export default {
                   label: resp.data.country,
                   total: resp.data.recovered,
                 });
+                this.arrTodayDeaths.push({
+                  label: resp.data.country,
+                  total: resp.data.todayDeaths,
+                  backgroundColor: this.getRandomColor()
+                })
                 this.arrTodayDeaths.push({
                   label: resp.data.country,
                   total: resp.data.todayDeaths,

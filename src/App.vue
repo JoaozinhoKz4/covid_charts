@@ -59,24 +59,24 @@
         />
       </div>
     </div>
-       <div class="row mt-5 mb-5" v-if="arrTodayDeaths.length > 0">
+       <div class="row mt-5 mb-5" v-if="arrComplex.length > 0">
       <div class="col">
-        <h2 class="text-center">Mortes no dia de Hoje</h2>
-        <multiple-chart
-          :chartData="arrTodayDeaths"
+        <h2 class="text-center">Testes para cada milhão de habitantes</h2>
+        <pie
+          :chartData="arrComplex"
           :options="chartOptions"
-          :label="date"
+          :label="arrComplex.label"
           :chartColors="arrTodayDeaths"
         />
       </div>
     </div>
-       <div class="row mt-5 mb-5" v-if="arrTodayDeaths.length > 0">
+       <div class="row mt-5 mb-5" v-if="arrDeathsOne.length > 0">
       <div class="col">
-        <h2 class="text-center">Mortes no dia de Hoje</h2>
-        <multiple-chart
-          :chartData="arrTodayDeaths"
+        <h2 class="text-center">Mortes para cada milhão de habitantes</h2>
+        <doughnut
+          :chartData="arrDeathsOne"
           :options="chartOptions"
-          :label="date"
+          :label="arrDeathsOne.label"
           :chartColors="arrTodayDeaths"
         />
       </div>
@@ -90,13 +90,17 @@ import moment from "moment";
 
 import LineChart from "./components/LineChart";
 import MultipleChart from './components/MultipleChart.vue';
+import Pie from './components/Pie.vue';
+import Doughnut from './components/doughnut.vue';
 
 
 export default {
   components: {
     LineChart,
     MultipleChart,
-  },
+    Doughnut,
+    Pie
+    },
   data() {
     return {
       datasets: [],
@@ -132,6 +136,7 @@ export default {
         backgroundColor: "#402A2C",
       },
       arrComplex: [],
+      arrDeathsOne: [],
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false,
@@ -201,9 +206,14 @@ export default {
                   total: resp.data.todayDeaths,
                   backgroundColor: this.getRandomColor()
                 })
-                this.arrTodayDeaths.push({
+                this.arrComplex.push({
                   label: resp.data.country,
-                  total: resp.data.todayDeaths,
+                  total: resp.data.testsPerOneMillion,
+                  backgroundColor: this.getRandomColor()
+                })
+                this.arrDeathsOne.push({
+                  label: resp.data.country,
+                  total: resp.data.deathsPerOneMillion,
                   backgroundColor: this.getRandomColor()
                 })
               })

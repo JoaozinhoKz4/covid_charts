@@ -26,7 +26,6 @@ export default {
       borderColor,
       pointBorderColor,
       pointBackgroundColor,
-      
     } = this.chartColors;
 
     this.renderChart(
